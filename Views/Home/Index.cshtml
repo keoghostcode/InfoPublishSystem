@@ -1,0 +1,51 @@
+@model IEnumerable<InfoPublishSystem.Models.News>
+@{
+    ViewBag.Title = "首页";
+    var categoryMap = ViewBag.CategoryMap as IDictionary<int, string> ?? new Dictionary<int, string>();
+    var userMap = ViewBag.UserMap as IDictionary<int, string> ?? new Dictionary<int, string>();
+}
+
+<div class="row">
+    <div class="col-lg-3 col-md-4">
+        <div class="card">
+            <div class="card-header">栏目分类</div>
+            <div class="list-group">
+                <a href="/" class="list-group-item @(ViewBag.SelectedCategoryId == null ? "active" : "")">全部新闻</a>
+                @foreach (var category in ViewBag.Categories)
+                {
+                    <a href="/?categoryId=@category.CategoryId" class="list-group-item @(ViewBag.SelectedCategoryId == category.CategoryId ? "active" : "")">@category.CategoryName</a>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-9 col-md-8">
+        <h2>新闻列表</h2>
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info">暂无新闻</div>
+        }
+        else
+        {
+            <div class="card-deck">
+                @foreach (var news in Model)
+                {
+                    var content = news.Content ?? "";
+                    var preview = content.Length > 100 ? content.Substring(0, 100) + "..." : content;
+                    var categoryName = categoryMap.ContainsKey(news.CategoryId) ? categoryMap[news.CategoryId] : "";
+                    var authorName = userMap.ContainsKey(news.AuthorId) ? userMap[news.AuthorId] : "";
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">@news.Title</h5>
+                            <p class="card-text">@preview</p>
+                            <p class="card-text">
+                                <small class="text-muted">栏目: @categoryName | 作者: @authorName | @news.PublishTime.ToString("yyyy-MM-dd HH:mm")</small>
+                            </p>
+                            <a href="/Home/Details/@news.NewsId" class="btn btn-primary">查看详情</a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

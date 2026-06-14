@@ -1,0 +1,38 @@
+@model InfoPublishSystem.Models.ViewModels.LoginViewModel
+
+@{
+    ViewBag.Title = "用户注册";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h2>用户登录</h2>
+        @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "form-horizontal" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.UserName, new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.UserName)
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Password, new { @class = "control-label" })
+                @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Password)
+            </div>
+
+            <div class="form-group">
+                @Html.CheckBoxFor(m => m.RememberMe)
+                @Html.LabelFor(m => m.RememberMe)
+            </div>
+
+            <button type="submit" class="btn btn-primary">登录</button>
+
+            <p class="mt-3">
+                <a href="/Account/Register">还没有账号？点击注册</a>
+            </p>
+        }
+    </div>
+</div>

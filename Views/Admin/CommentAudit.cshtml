@@ -1,0 +1,53 @@
+@model IEnumerable<InfoPublishSystem.Models.ViewModels.CommentViewModel>
+
+@{
+    ViewBag.Title = "留言审核";
+}
+
+<h2>留言审核</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">暂无待审核留言</div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>新闻标题</th>
+                <th>留言用户</th>
+                <th>留言内容</th>
+                <th>留言时间</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var comment in Model)
+            {
+                <tr>
+                    <td>@comment.CommentId</td>
+                    <td>@comment.NewsTitle</td>
+                    <td>@comment.UserName</td>
+                    <td>@comment.Content</td>
+                    <td>@comment.CreateTime.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>
+                        @using (Html.BeginForm("AuditComment", "Admin", FormMethod.Post))
+                        {
+                            @Html.Hidden("commentId", comment.CommentId)
+                            @Html.Hidden("approve", true)
+                            <button type="submit" class="btn btn-sm btn-success">通过</button>
+                        }
+                        @using (Html.BeginForm("AuditComment", "Admin", FormMethod.Post))
+                        {
+                            @Html.Hidden("commentId", comment.CommentId)
+                            @Html.Hidden("approve", false)
+                            <button type="submit" class="btn btn-sm btn-danger">拒绝</button>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

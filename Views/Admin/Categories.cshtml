@@ -1,0 +1,39 @@
+@{
+    ViewBag.Title = "栏目管理";
+}
+
+<h2>栏目管理</h2>
+
+@if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+{
+    <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+}
+
+<p>
+    <a href="/Admin/AddCategory" class="btn btn-success">添加栏目</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>栏目名称</th>
+            <th>排序</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var category in Model)
+        {
+            <tr>
+                <td>@category.CategoryId</td>
+                <td>@category.CategoryName</td>
+                <td>@category.SortOrder</td>
+                <td>
+                    <a href="/Admin/EditCategory/@category.CategoryId" class="btn btn-sm btn-primary">编辑</a>
+                    <a href="/Admin/DeleteCategory/@category.CategoryId" class="btn btn-sm btn-danger" onclick="return confirm('确定删除此栏目吗？')">删除</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,42 @@
+@model IEnumerable<InfoPublishSystem.Models.ViewModels.NewsListItemViewModel>
+
+@{
+    ViewBag.Title = "新闻管理";
+}
+
+<h2>新闻管理</h2>
+
+<p>
+    <a href="/Admin/AddNews" class="btn btn-success">发布新闻</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>标题</th>
+            <th>栏目</th>
+            <th>作者</th>
+            <th>发布时间</th>
+            <th>状态</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var news in Model)
+        {
+            <tr>
+                <td>@news.NewsId</td>
+                <td>@news.Title</td>
+                <td>@news.CategoryName</td>
+                <td>@news.AuthorName</td>
+                <td>@news.PublishTime.ToString("yyyy-MM-dd HH:mm")</td>
+                <td>@(news.IsVisible ? "显示" : "隐藏")</td>
+                <td>
+                    <a href="/Admin/EditNews/@news.NewsId" class="btn btn-sm btn-primary">编辑</a>
+                    <a href="/Admin/DeleteNews/@news.NewsId" class="btn btn-sm btn-danger" onclick="return confirm('确定删除此新闻吗？')">删除</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

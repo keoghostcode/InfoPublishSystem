@@ -1,0 +1,43 @@
+# Visual Studio generated files
+.vs/
+*.user
+*.suo
+*.cache
+*.dbmdl
+*.opendbmdl
+*.pfx
+*.publishsettings
+Publish/
+
+# Build outputs
+bin/
+obj/
+
+# NuGet packages
+packages/
+*.nupkg
+
+# Logs
+*.log
+
+# SQL Server files
+*.mdf
+*.ldf
+*.bak
+
+# IIS Express
+IISExpress/
+
+# Node.js modules
+node_modules/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# OS generated files
+Thumbs.db
+.DS_Store
+
+# Web.config transformations (only keep base Web.config)
+Web.Release.config
+Web.Debug.config

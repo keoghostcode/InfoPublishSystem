@@ -1,0 +1,152 @@
+@model InfoPublishSystem.Models.News
+@{
+    ViewBag.Title = Model.Title;
+    var categoryName = ViewBag.CategoryName as string ?? "";
+    var authorName = ViewBag.AuthorName as string ?? "";
+    var isLoggedIn = ViewBag.IsLoggedIn != null && (bool)ViewBag.IsLoggedIn;
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h1>@Model.Title</h1>
+        <p class="text-muted">栏目: @categoryName | 作者: @authorName | @Model.PublishTime.ToString("yyyy-MM-dd HH:mm")</p>
+        <hr />
+        <div class="content">
+            @Html.Raw(Model.Content ?? "")
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-12">
+        <h3>留言评论</h3>
+        @if (isLoggedIn)
+        {
+            <div class="card mb-4">
+                <div class="card-body">
+                    <textarea id="commentContent" class="form-control" rows="3" placeholder="发表你的评论..."></textarea>
+                    <button id="submitComment" class="btn btn-primary mt-2">提交留言</button>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">请先<a href="/Account/Login">登录</a>后发表留言</div>
+        }
+
+        <div id="commentList">
+            <div class="text-center text-muted py-4">加载中...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var newsId = @Model.NewsId;
+    var isLoggedIn = @(isLoggedIn ? "true" : "false");
+
+    $(function () {
+        loadComments();
+    });
+
+    function loadComments() {
+        $.get("/Comment/GetList?newsId=" + newsId, function (data) {
+            var html = "";
+            if (data.length == 0) {
+                html = '<div class="text-center text-muted py-4">暂无留言</div>';
+            } else {
+                $.each(data, function (index, comment) {
+                    html += '<div class="card mb-3">';
+                    html += '<div class="card-body">';
+                    html += '<p class="card-text">' + comment.Content + '</p>';
+                    html += '<p class="text-muted small">' + String.fromCharCode(64) + comment.UserName + ' - ' + comment.CreateTime + '</p>';
+                    if (isLoggedIn) {
+                        html += '<button class="btn btn-sm btn-outline-primary reply-btn" data-comment-id="' + comment.CommentId + '">回复</button>';
+                    }
+                    html += '</div>';
+                    html += '<div class="card-footer replies-container" id="replies-' + comment.CommentId + '"></div>';
+                    html += '</div>';
+                });
+            }
+            $("#commentList").html(html);
+            $.each(data, function (index, comment) {
+                if (comment.HasChildren) {
+                    loadReplies(comment.CommentId);
+                }
+            });
+        });
+    }
+
+    function loadReplies(parentId) {
+        var container = $("#replies-" + parentId);
+
+        if (container.length == 0) {
+            return;
+        }
+
+        $.get("/Comment/GetReplies?parentCommentId=" + parentId, function (data) {
+            var html = "";
+            $.each(data, function (index, reply) {
+                html += '<div class="reply-item border-left pl-3 py-2">';
+                html += '<p class="small">' + reply.Content + '</p>';
+                html += '<p class="text-muted small">' + String.fromCharCode(64) + reply.UserName + ' - ' + reply.CreateTime + '</p>';
+                html += '</div>';
+            });
+            container.find(".reply-item").remove();
+            container.append(html);
+        });
+    }
+
+    $("#submitComment").click(function () {
+        var content = $("#commentContent").val();
+        if (!content.trim()) {
+            alert("请输入留言内容");
+            return;
+        }
+        $.post("/Comment/Add", { newsId: newsId, content: content }, function (data) {
+            alert(data.message);
+            if (data.success) {
+                $("#commentContent").val("");
+                loadComments();
+            }
+        });
+    });
+
+    $(document).on("click", ".reply-btn", function () {
+        var parentId = $(this).data("comment-id");
+        var container = $("#replies-" + parentId);
+
+        if (container.length == 0) {
+            container = $('<div class="card-footer replies-container" id="replies-' + parentId + '"></div>');
+            $(this).closest(".card").append(container);
+        }
+
+        if (container.find(".reply-form").length == 0) {
+            var form = '<div class="reply-form mt-2">' +
+                '<textarea class="form-control reply-content" rows="2" placeholder="回复此评论..."></textarea>' +
+                '<button class="btn btn-sm btn-primary mt-1 submit-reply" data-parent-id="' + parentId + '">提交回复</button>' +
+                '</div>';
+            container.prepend(form);
+        }
+
+        loadReplies(parentId);
+    });
+
+    $(document).on("click", ".submit-reply", function () {
+        var $btn = $(this);
+        var parentId = $btn.data("parent-id");
+        var content = $btn.prev(".reply-content").val();
+
+        if (!content.trim()) {
+            alert("请输入回复内容");
+            return;
+        }
+
+        $.post("/Comment/Reply", { newsId: newsId, parentCommentId: parentId, content: content }, function (data) {
+            alert(data.message);
+            if (data.success) {
+                $btn.prev(".reply-content").val("");
+                loadComments();
+            }
+        });
+    });
+</script>

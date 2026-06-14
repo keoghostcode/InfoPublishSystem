@@ -1,0 +1,34 @@
+@model InfoPublishSystem.Models.ViewModels.NewsViewModel
+
+@{
+    ViewBag.Title = "编辑新闻";
+}
+
+<h2>编辑新闻</h2>
+
+@using (Html.BeginForm("EditNews", "Admin", FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.NewsId)
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Title, new { @class = "control-label" })
+        @Html.TextBoxFor(m => m.Title, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Title)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.CategoryId, new { @class = "control-label" })
+        @Html.DropDownListFor(m => m.CategoryId, new SelectList(Model.Categories, "CategoryId", "CategoryName"), "请选择栏目", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.CategoryId)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Content, new { @class = "control-label" })
+        @Html.TextAreaFor(m => m.Content, new { @class = "form-control", rows = "10" })
+        @Html.ValidationMessageFor(m => m.Content)
+    </div>
+
+    <button type="submit" class="btn btn-primary">保存</button>
+    <a href="/Admin/NewsManage" class="btn btn-default">取消</a>
+}
